@@ -5,49 +5,37 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# ----------------------------------------
-# Load model, encoders, and dataset
-# ----------------------------------------
-# @st.cache_resource
-# def load_assets():
-#     model = joblib.load("models/random_forest_model.joblib")
-#     encoders = joblib.load("models/label_encoders.joblib")
-#     data = pd.read_csv("data/credit_risk_dataset.csv")
-#     return model, encoders, data
 
-# model, encoders, data = load_assets()
-
-# Cache only the model and encoders (they don’t change)
 @st.cache_resource
 def load_model_assets():
     model = joblib.load("models/random_forest_model.joblib")
     encoders = joblib.load("models/label_encoders.joblib")
     return model, encoders
 
-# Load model and encoders once
+
 model, encoders = load_model_assets()
 
-# Always load a fresh dataset from CSV every time Streamlit reruns
+
 data = pd.read_csv("data/credit_risk_dataset.csv")
 
 
-# ----------------------------------------
+
 # Streamlit Page Setup
-# ----------------------------------------
 st.set_page_config(page_title="Credit Risk Predictor", layout="wide")
 st.title("Credit Risk Prediction System")
 st.write(
-    "This application predicts the likelihood of a loan applicant defaulting "
+    """This application predicts the likelihood of a loan applicant defaulting "
     "based on their personal, financial, and loan-related information. "
-    "It also provides visual insights into key relationships within the credit risk dataset."
+    "It also provides visual insights into key relationships within the credit risk dataset.
+"""
 )
+
 
 # Tabs for navigation
 tab1, tab2 = st.tabs(["Prediction", "Data Insights"])
 
-# ----------------------------------------
+
 # Tab 1: Prediction
-# ----------------------------------------
 with tab1:
     st.subheader("Enter Applicant Details")
 
@@ -99,16 +87,11 @@ with tab1:
 
         st.caption("Model used: Random Forest | Data source: credit_risk_dataset.csv")
 
-# ----------------------------------------
-# Tab 2: Data Visualization
-# ----------------------------------------
-with tab2:
-    # st.subheader("Dataset Overview")
-    # st.dataframe(data.head(10))
-    # --- keep the original data intact ---
-    overview_data = data.copy()
 
-    # Display only the first few clean rows
+# Tab 2: Data Visualization
+with tab2:
+   
+    overview_data = data.copy()
     display_data = overview_data.rename(columns={
         "person_age": "Age",
         "person_income": "Annual Income (USD)",
@@ -125,7 +108,7 @@ with tab2:
     })
 
     st.subheader("Dataset Overview")
-    st.dataframe(display_data.head(10), use_container_width=True)
+    st.dataframe(display_data.head(10), width=True,)
 
 
     if "loan_status" not in data.columns:
@@ -134,10 +117,9 @@ with tab2:
         st.info("Note: In all charts below — 0 represents **No Default (Safe Borrower)**, "
                 "and 1 represents **Default (High Risk Borrower)**.")
 
-        # 1️⃣ Loan Intent Distribution (Pie Chart)
+        # 1 Loan Intent Distribution
         st.markdown("#### Loan Intent Distribution")
         
-        # Clean up labels for better readability
         data["loan_intent"] = data["loan_intent"].replace({
             "DEBTCONSOLIDATION": "DEBT CONSOLIDATION",
             "HOMEIMPROVEMENT": "HOME IMPROVEMENT"
@@ -150,12 +132,13 @@ with tab2:
             labels=intent_counts.index,
             autopct="%1.1f%%",
             startangle=90,
-            colors=sns.color_palette("pastel")
+            colors=sns.color_palette("pastel"),
+            
         )
         ax.axis("equal")
-        st.pyplot(fig)
+        st.pyplot(fig,width=600)
 
-        # 2️⃣ Age Distribution by Loan Status (Histogram)
+        # 2 Age Distribution by Loan Status
         st.markdown("#### Age Distribution by Loan Status")
         filtered_data = data[data["person_age"] <= 80]
         fig, ax = plt.subplots()
@@ -172,12 +155,11 @@ with tab2:
         ax.set_xlim(18, 80)
         ax.set_xlabel("Person Age")
         ax.set_ylabel("Number of Applicants")
-        st.pyplot(fig)
+        st.pyplot(fig,width=600)
 
-        # 3️⃣ Income vs Loan Amount (Line Chart)
+        # 3 Income vs Loan Amount
         st.markdown("#### Relationship Between Income and Loan Amount")
 
-        # Create income ranges
         data["income_group"] = pd.cut(
             data["person_income"],
             bins=[0, 20000, 40000, 60000, 80000, 100000, 150000, 200000, np.inf],
@@ -187,9 +169,8 @@ with tab2:
             ]
         )
 
-        # Calculate average loan amount for each income group
         avg_loan_by_income = (
-            data.groupby("income_group")["loan_amnt"]
+            data.groupby("income_group",observed=True)["loan_amnt"]
             .mean()
             .reset_index()
         )
@@ -210,13 +191,8 @@ with tab2:
         ax.set_title("Average Loan Amount Across Income Levels")
         plt.xticks(rotation=30)
         plt.grid(True, linestyle="--", alpha=0.6)
-        st.pyplot(fig)
+        st.pyplot(fig,width=600)
 
-
-    st.caption("Visualizations generated from data/credit_risk_dataset.csv")
-
-# ----------------------------------------
 # Footer
-# ----------------------------------------
 st.markdown("---")
-st.write("Developed as part of the Credit Risk Prediction Project.")
+st.write(" Copyright © . All rights reserved. Credit Risk Prediction.")
