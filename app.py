@@ -108,7 +108,7 @@ with tab2:
     })
 
     st.subheader("Dataset Overview")
-    st.dataframe(display_data.head(10), width=True,)
+    st.dataframe(display_data.head(10))
 
 
     if "loan_status" not in data.columns:
