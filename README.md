@@ -2,6 +2,10 @@
 
 A machine learning application that predicts credit risk and loan default probability using personal and financial data.
 
+# My Streamlit App
+
+🚀 **Live App:** [Click here to view](https://credit-risk-predictor-lrhp.streamlit.app/)
+
 ## Quick Start
 
 1. Clone and setup:
